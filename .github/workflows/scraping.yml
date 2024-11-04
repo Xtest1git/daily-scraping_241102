@@ -36,7 +36,7 @@ jobs:
 
     - name: Transfer CSV and Blog Parts to Server
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # 必ず正しいSSHキーを設定する
       run: |
         # Setup SSH
         mkdir -p ~/.ssh
@@ -45,7 +45,7 @@ jobs:
         ssh-keyscan -p 10022 -H sv5001.wpx.ne.jp >> ~/.ssh/known_hosts
 
         # 固定フォルダ名（例: 最初に作成した日付のフォルダ）
-        FIXED_FOLDER="2024-11-04"  # 固定フォルダ名
+        FIXED_FOLDER="2024-11-04"  # 必要ならアップデートの日付に合わせて変更
 
         # Ensure the fixed folder exists on the server
         ssh -p 10022 kkkk777@sv5001.wpx.ne.jp "mkdir -p /home/kkkk777/public_html/blogparts/$FIXED_FOLDER"
