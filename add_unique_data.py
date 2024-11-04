@@ -1,15 +1,11 @@
 import csv
 from datetime import datetime, timedelta
-from scrape import get_new_data  # scrape.py から get_new_data をインポート
+from scrape import get_new_data  # このインポートを維持し、循環インポートがないことを確認
 
-# CSVファイルのパス
 csv_file = 'data.csv'
-
-# 有効期限（例: 30日）
 valid_duration = timedelta(days=30)
 today = datetime.today()
 
-# 既存データを読み込む関数
 def load_existing_data():
     try:
         with open(csv_file, newline='', encoding='utf-8') as file:
@@ -20,16 +16,14 @@ def load_existing_data():
     except FileNotFoundError:
         return [], []
 
-# 新しいデータをCSVに追加する関数
 def append_to_csv(new_data):
     with open(csv_file, 'a', newline='', encoding='utf-8') as file:
         fieldnames = ['title', 'link', 'image_url', 'scrape_time']
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         if file.tell() == 0:
-            writer.writeheader()  # ファイルが空の場合、ヘッダーを書き込む
+            writer.writeheader()
         writer.writerows(new_data)
 
-# メインの処理
 def manage_data():
     existing_data, existing_titles = load_existing_data()
     new_data = get_new_data()
@@ -41,7 +35,6 @@ def manage_data():
     else:
         print("No new data to add.")
 
-    # 古いデータを削除
     filtered_data = [
         row for row in existing_data
         if today - datetime.strptime(row['scrape_time'], '%Y-%m-%d %H:%M:%S') <= valid_duration
