@@ -6,8 +6,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # 手動トリガーを追加
-
+  workflow_dispatch:  # 手動トリガーを有効にする設定
 
 jobs:
   scrape_and_update_csv:
@@ -43,17 +42,17 @@ jobs:
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H your_server_ip >> ~/.ssh/known_hosts
+        ssh-keyscan -H 162.43.96.2 >> ~/.ssh/known_hosts
 
-        # 固定フォルダ名（最初に作成する時に日付を入れる）
-        FIXED_FOLDER="2024-11-04"  # ここを最初に実行する時の日付に設定
+        # 固定フォルダ名（例: 最初に作成した日付のフォルダ）
+        FIXED_FOLDER="2024-11-04"  # 固定フォルダ名
 
         # Ensure the fixed folder exists on the server
-        ssh your_user@your_server_ip "mkdir -p /home/your_user/public_html/blogparts/$FIXED_FOLDER"
+        ssh your_user@162.43.96.2 "mkdir -p /home/your_user/public_html/blogparts/$FIXED_FOLDER"
 
         # Transfer CSV file
-        scp data.csv your_user@your_server_ip:/home/your_user/public_html/blogparts/$FIXED_FOLDER/
+        scp data.csv your_user@162.43.96.2:/home/your_user/public_html/blogparts/$FIXED_FOLDER/
 
         # Transfer Blog Parts (JS and CSS)
-        scp blogpart.js your_user@your_server_ip:/home/your_user/public_html/blogparts/$FIXED_FOLDER/
-        scp blogpart.css your_user@your_server_ip:/home/your_user/public_html/blogparts/$FIXED_FOLDER/
+        scp blogpart.js your_user@162.43.96.2:/home/your_user/public_html/blogparts/$FIXED_FOLDER/
+        scp blogpart.css your_user@162.43.96.2:/home/your_user/public_html/blogparts/$FIXED_FOLDER/
