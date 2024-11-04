@@ -23,13 +23,13 @@ data = []
 # 各URLからデータをスクレイピング
 for url in urls:
     response = requests.get(url, headers=headers)
-    print(f"Fetching URL: {url}, Status Code: {response.status_code}")  # デバッグ用出力
+    print(f"Fetching URL: {url}, Status Code: {response.status_code}")
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, 'html.parser')
         items = soup.find_all('div', class_='itemWrapper')
         
         if not items:
-            print(f"No items found on {url}")  # デバッグ用出力: アイテムが見つからない場合
+            print(f"No items found on {url}")
 
         for item in items:
             try:
@@ -43,32 +43,19 @@ for url in urls:
                 scrape_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 
                 # データをリストに追加
-                data.append([title, link, img_url, scrape_time])
+                data.append({
+                    "title": title,
+                    "link": link,
+                    "image_url": img_url,
+                    "scrape_time": scrape_time
+                })
             except AttributeError as e:
-                print(f"Error parsing item on {url}: {e}")  # デバッグ用出力: パースエラーが発生した場合
+                print(f"Error parsing item on {url}: {e}")
     else:
         print(f"Failed to retrieve {url}, status code: {response.status_code}")
 
-# データをCSVファイルに書き込む
-csv_file_path = "data.csv"
-
-# ファイルが存在する場合は、既存のデータを取得
-existing_titles = set()
-if os.path.exists(csv_file_path):
-    with open(csv_file_path, mode='r', encoding='utf-8') as file:
-        reader = csv.reader(file)
-        header = next(reader, None)  # ヘッダーをスキップ
-        for row in reader:
-            if row:
-                existing_titles.add(row[0])  # タイトルをセットに追加
-
-# 新しいデータをCSVファイルに書き込む
-with open(csv_file_path, mode='a', newline='', encoding='utf-8') as file:
-    writer = csv.writer(file)
-    if os.stat(csv_file_path).st_size == 0:  # ファイルが空の場合、ヘッダーを書き込む
-        writer.writerow(['title', 'link', 'image_url', 'scrape_time'])
-    for item in data:
-        if item[0] not in existing_titles:  # 既存のデータと重複しない場合に書き込む
-            writer.writerow(item)
+# get_new_data 関数を定義して、データを返す
+def get_new_data():
+    return data
 
 print("Scraping and data saving completed successfully.")
