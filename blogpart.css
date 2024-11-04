@@ -1,0 +1,39 @@
+#blog-widget-1, #blog-widget-2, #blog-widget-3 {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  margin: 0 !important;
+}
+
+#blog-widget-1 a, #blog-widget-2 a, #blog-widget-3 a {
+  display: block !important;
+  width: calc(16.666% - 10px) !important;
+  text-align: center !important;
+  margin: 5px 0 !important;
+  box-sizing: border-box !important;
+}
+
+#blog-widget-1 img, #blog-widget-2 img, #blog-widget-3 img {
+  width: 100% !important;
+  aspect-ratio: 4 / 3 !important;
+  object-fit: cover !important;
+  margin-bottom: 1px !important; /* 画像とテキストの間の余白を1pxに */
+}
+
+#blog-widget-1 .title, #blog-widget-2 .title, #blog-widget-3 .title {
+  font-size: 14px !important;
+  font-weight: bold !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  line-height: 1.2 !important;
+  margin-bottom: 5px !important;
+}
+
+@media (max-width: 768px) {
+  #blog-widget-1 a, #blog-widget-2 a, #blog-widget-3 a {
+    width: calc(50% - 10px) !important;
+  }
+}
