@@ -36,23 +36,28 @@ jobs:
 
     - name: Transfer CSV and Blog Parts to Server
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_2048 }}  # GitHub SecretsからSSHキーを取得
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_2048 }}
       run: |
         # Setup SSH
+        echo "Setting up SSH..."
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H 162.43.96.2 >> ~/.ssh/known_hosts
+        echo "SSH setup completed."
 
         # 固定フォルダ名（例: 最初に作成した日付のフォルダ）
         FIXED_FOLDER="2024-11-04"  # 固定フォルダ名
 
         # Ensure the fixed folder exists on the server
-        ssh your_user@162.43.96.2 "mkdir -p /home/your_user/public_html/blogparts/$FIXED_FOLDER"
+        echo "Creating directory on the server..."
+        ssh kkkk777@162.43.96.2 "mkdir -p /home/kkkk777/public_html/blogparts/$FIXED_FOLDER"
+        echo "Directory creation completed."
 
         # Transfer CSV file
-        scp data.csv your_user@162.43.96.2:/home/your_user/public_html/blogparts/$FIXED_FOLDER/
-
-        # Transfer Blog Parts (JS and CSS)
-        scp blogpart.js your_user@162.43.96.2:/home/your_user/public_html/blogparts/$FIXED_FOLDER/
-        scp blogpart.css your_user@162.43.96.2:/home/your_user/public_html/blogparts/$FIXED_FOLDER/
+        echo "Transferring data.csv..."
+        scp data.csv kkkk777@162.43.96.2:/home/kkkk777/public_html/blogparts/$FIXED_FOLDER/
+        echo "Transferring blogpart.js..."
+        scp blogpart.js kkkk777@162.43.96.2:/home/kkkk777/public_html/blogparts/$FIXED_FOLDER/
+        echo "Transferring blogpart.css..."
+        scp blogpart.css kkkk777@162.43.96.2:/home/kkkk777/public_html/blogparts/$FIXED_FOLDER/
