@@ -18,26 +18,35 @@ def get_new_data():
     data = []
 
     for url in urls:
+        print(f"Fetching URL: {url}")
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             soup = BeautifulSoup(response.content, 'html.parser')
+            print(soup.prettify())  # HTMLの構造を出力して確認
+
             items = soup.find_all('div', class_='itemWrapper')
+            if not items:
+                print(f"No items found at {url}. Check HTML structure.")
 
             for item in items:
-                title = item.find('div', class_='itemTitle').get_text().strip()
-                link = item.find('a')['href']
-                img_url = item.find('img')['src']
-                if img_url.startswith('//'):
-                    img_url = 'https:' + img_url
+                try:
+                    title = item.find('div', class_='itemTitle').get_text().strip()
+                    link = item.find('a')['href']
+                    img_url = item.find('img')['src']
+                    if img_url.startswith('//'):
+                        img_url = 'https:' + img_url
 
-                scrape_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                data.append({
-                    'title': title,
-                    'link': link,
-                    'image_url': img_url,
-                    'scrape_time': scrape_time
-                })
+                    scrape_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    data.append({
+                        'title': title,
+                        'link': link,
+                        'image_url': img_url,
+                        'scrape_time': scrape_time
+                    })
+                except AttributeError as e:
+                    print(f"Error parsing item: {e}")
         else:
             print(f"Failed to retrieve {url}, status code: {response.status_code}")
 
+    print(f"Total items scraped: {len(data)}")
     return data
