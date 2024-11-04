@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 import csv
 import os
 
@@ -50,6 +50,7 @@ existing_titles = set()
 if os.path.exists(csv_file_path):
     with open(csv_file_path, mode='r', encoding='utf-8') as file:
         reader = csv.reader(file)
+        header = next(reader, None)  # ヘッダーをスキップ
         for row in reader:
             if row:
                 existing_titles.add(row[0])  # タイトルをセットに追加
@@ -57,8 +58,32 @@ if os.path.exists(csv_file_path):
 # 新しいデータをCSVファイルに書き込む
 with open(csv_file_path, mode='a', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
+    if os.stat(csv_file_path).st_size == 0:  # ファイルが空の場合、ヘッダーを書き込む
+        writer.writerow(['title', 'link', 'image_url', 'scrape_time'])
     for item in data:
         if item[0] not in existing_titles:  # 既存のデータと重複しない場合に書き込む
             writer.writerow(item)
 
-print("Scraping and data saving completed successfully.")
+# 有効期限（例: 30日）
+valid_duration = timedelta(days=30)
+today = datetime.today()
+
+# 古いデータを削除
+filtered_data = []
+if os.path.exists(csv_file_path):
+    with open(csv_file_path, mode='r', encoding='utf-8') as file:
+        reader = csv.reader(file)
+        header = next(reader)  # ヘッダーを取得
+        for row in reader:
+            if row:
+                scrape_time = datetime.strptime(row[3], '%Y-%m-%d %H:%M:%S')
+                if today - scrape_time <= valid_duration:
+                    filtered_data.append(row)
+
+# 古いデータを削除して再度書き込む
+with open(csv_file_path, mode='w', newline='', encoding='utf-8') as file:
+    writer = csv.writer(file)
+    writer.writerow(['title', 'link', 'image_url', 'scrape_time'])  # ヘッダーを書き込む
+    writer.writerows(filtered_data)
+
+print("Scraping, data saving, and old data cleanup completed successfully.")
