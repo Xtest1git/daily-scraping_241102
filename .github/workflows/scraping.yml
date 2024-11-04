@@ -35,7 +35,7 @@ jobs:
 
     - name: Transfer CSV to Server
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # GitHub Secretsに保存したSSHキー
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_2048 }}  # 新しく保存したSSHキーを使用
       run: |
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
