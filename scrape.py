@@ -22,25 +22,28 @@ data = []
 
 # 各URLからデータをスクレイピング
 for url in urls:
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.content, 'html.parser')
-        items = soup.find_all('div', class_='itemWrapper')
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.content, 'html.parser')
+            items = soup.find_all('div', class_='itemWrapper')
 
-        for item in items:
-            title = item.find('div', class_='itemTitle').get_text().strip()
-            link = item.find('a')['href']
-            img_url = item.find('img')['src']
-            if img_url.startswith('//'):
-                img_url = 'https:' + img_url
+            for item in items:
+                title = item.find('div', class_='itemTitle').get_text().strip()
+                link = item.find('a')['href']
+                img_url = item.find('img')['src']
+                if img_url.startswith('//'):
+                    img_url = 'https:' + img_url
 
-            # 現在の日時を取得してフォーマット
-            scrape_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            
-            # データをリストに追加
-            data.append([title, link, img_url, scrape_time])
-    else:
-        print(f"Failed to retrieve {url}, status code: {response.status_code}")
+                # 現在の日時を取得してフォーマット
+                scrape_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                
+                # データをリストに追加
+                data.append([title, link, img_url, scrape_time])
+        else:
+            print(f"Failed to retrieve {url}, status code: {response.status_code}")
+    except Exception as e:
+        print(f"An error occurred while scraping {url}: {e}")
 
 # データをCSVファイルに書き込む
 csv_file_path = "data.csv"
