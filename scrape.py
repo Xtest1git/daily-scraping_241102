@@ -1,57 +1,43 @@
-import csv
-from datetime import datetime, timedelta
-from scrape import get_new_data  # scrape.py から get_new_data をインポート
+import requests
+from bs4 import BeautifulSoup
+from datetime import datetime
 
-# CSVファイルのパス
-csv_file = 'data.csv'
-
-# 有効期限（例: 30日）
-valid_duration = timedelta(days=30)
-today = datetime.today()
-
-# 既存データを読み込む関数
-def load_existing_data():
-    try:
-        with open(csv_file, newline='', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            existing_data = [row for row in reader]
-            existing_titles = [row['title'] for row in existing_data]
-        return existing_data, existing_titles
-    except FileNotFoundError:
-        return [], []
-
-# 新しいデータをCSVに追加する関数
-def append_to_csv(new_data):
-    with open(csv_file, 'a', newline='', encoding='utf-8') as file:
-        fieldnames = ['title', 'link', 'image_url', 'scrape_time']
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
-        if file.tell() == 0:
-            writer.writeheader()  # ファイルが空の場合、ヘッダーを書き込む
-        writer.writerows(new_data)
-
-# メインの処理
-def manage_data():
-    existing_data, existing_titles = load_existing_data()
-    new_data = get_new_data()
-    unique_new_data = [item for item in new_data if item['title'] not in existing_titles]
-
-    if unique_new_data:
-        append_to_csv(unique_new_data)
-        print(f"{len(unique_new_data)} new rows added.")
-    else:
-        print("No new data to add.")
-
-    # 古いデータを削除
-    filtered_data = [
-        row for row in existing_data
-        if today - datetime.strptime(row['scrape_time'], '%Y-%m-%d %H:%M:%S') <= valid_duration
+# 新しいデータをスクレイピングして返す関数
+def get_new_data():
+    # スクレイピング対象のURL
+    urls = [
+        "https://movie.eroterest.net/site/s/18511/?word=&page=1",
+        "https://movie.eroterest.net/site/s/18511/?word=&page=2",
+        "https://movie.eroterest.net/site/s/18651"
     ]
-    with open(csv_file, 'w', newline='', encoding='utf-8') as file:
-        fieldnames = ['title', 'link', 'image_url', 'scrape_time']
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(filtered_data)
-    print(f"{len(existing_data) - len(filtered_data)} old rows deleted.")
 
-if __name__ == "__main__":
-    manage_data()
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "Referer": "https://movie.eroterest.net"
+    }
+
+    data = []
+    for url in urls:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.content, 'html.parser')
+            items = soup.find_all('div', class_='itemWrapper')
+
+            for item in items:
+                title = item.find('div', class_='itemTitle').get_text().strip()
+                link = item.find('a')['href']
+                img_url = item.find('img')['src']
+                if img_url.startswith('//'):
+                    img_url = 'https:' + img_url
+
+                scrape_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                data.append({
+                    'title': title,
+                    'link': link,
+                    'image_url': img_url,
+                    'scrape_time': scrape_time
+                })
+        else:
+            print(f"Failed to retrieve {url}, status code: {response.status_code}")
+
+    return data
