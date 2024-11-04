@@ -25,21 +25,30 @@ for url in urls:
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, 'html.parser')
-        print(soup.prettify())  # デバッグ用: 取得したHTMLを表示
+        print(soup.prettify())  # デバッグ用: HTMLを表示して確認する
 
+        # データ抽出のロジックを修正
         items = soup.find_all('div', class_='itemWrapper')
         if not items:
             print(f"No items found on {url}. Please check the structure of the page.")
+        else:
+            for item in items:
+                # データ抽出部分を再確認
+                title_tag = item.find('div', class_='itemTitle')
+                link_tag = item.find('a')
+                img_tag = item.find('img')
 
-        for item in items:
-            title = item.find('div', class_='itemTitle').get_text().strip()
-            link = item.find('a')['href']
-            img_url = item.find('img')['src']
-            if img_url.startswith('//'):
-                img_url = 'https:' + img_url
+                if title_tag and link_tag and img_tag:
+                    title = title_tag.get_text().strip()
+                    link = link_tag['href']
+                    img_url = img_tag['src']
+                    if img_url.startswith('//'):
+                        img_url = 'https:' + img_url
 
-            scrape_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            data.append([title, link, img_url, scrape_time])
+                    scrape_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    data.append([title, link, img_url, scrape_time])
+                else:
+                    print(f"One or more elements were not found for an item on {url}.")
     else:
         print(f"Failed to retrieve {url}, status code: {response.status_code}")
 
