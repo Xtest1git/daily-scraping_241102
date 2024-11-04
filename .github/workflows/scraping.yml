@@ -33,12 +33,25 @@ jobs:
       run: |
         python add_unique_data.py
 
-    - name: Transfer CSV to Server
+    - name: Transfer CSV and Blog Parts to Server
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_2048 }}  # 新しく保存したSSHキーを使用
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_2048 }}
       run: |
+        # Setup SSH
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H your_server_ip >> ~/.ssh/known_hosts
-        scp data.csv your_user@your_server_ip:/path/to/your/folder
+
+        # 固定フォルダ名（最初に作成する時に日付を入れる）
+        FIXED_FOLDER="2024-11-04"  # ここを最初に実行する時の日付に設定
+
+        # Ensure the fixed folder exists on the server
+        ssh your_user@your_server_ip "mkdir -p /home/your_user/public_html/blogparts/$FIXED_FOLDER"
+
+        # Transfer CSV file
+        scp data.csv your_user@your_server_ip:/home/your_user/public_html/blogparts/$FIXED_FOLDER/
+
+        # Transfer Blog Parts (JS and CSS)
+        scp blogpart.js your_user@your_server_ip:/home/your_user/public_html/blogparts/$FIXED_FOLDER/
+        scp blogpart.css your_user@your_server_ip:/home/your_user/public_html/blogparts/$FIXED_FOLDER/
