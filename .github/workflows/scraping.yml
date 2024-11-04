@@ -6,6 +6,8 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:  # 手動トリガーを追加
+
 
 jobs:
   scrape_and_update_csv:
