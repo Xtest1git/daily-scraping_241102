@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # 手動トリガーを有効にする設定
+  workflow_dispatch:  # 手動トリガーを有効にする
 
 jobs:
   scrape_and_update_csv:
@@ -36,7 +36,7 @@ jobs:
 
     - name: Transfer CSV and Blog Parts to Server
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_2048 }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_2048 }}  # GitHub SecretsからSSHキーを取得
       run: |
         # Setup SSH
         mkdir -p ~/.ssh
