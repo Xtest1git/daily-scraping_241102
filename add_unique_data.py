@@ -1,6 +1,6 @@
 import csv
 from datetime import datetime, timedelta
-from scrape import get_new_data
+from scrape import get_new_data  # scrape.py から get_new_data をインポート
 
 # CSVファイルのパス
 csv_file = 'data.csv'
