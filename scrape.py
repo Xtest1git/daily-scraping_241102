@@ -14,19 +14,25 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 }
 
-# get_new_data関数を定義してスクレイピングデータを返す
 def get_new_data():
     data = []
     for url in urls:
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             soup = BeautifulSoup(response.content, 'html.parser')
+            
+            # デバッグ: HTMLの内容を出力して確認
+            print(soup.prettify())
+
             items = soup.find_all('div', class_='itemWrapper')
+            if not items:
+                print("No items found. Check the class name or structure of the page.")
+                continue
 
             for item in items:
-                title = item.find('div', class_='itemTitle').get_text().strip()
-                link = item.find('a')['href']
-                img_url = item.find('img')['src']
+                title = item.find('div', class_='itemTitle').get_text().strip() if item.find('div', class_='itemTitle') else "No title found"
+                link = item.find('a')['href'] if item.find('a') else "No link found"
+                img_url = item.find('img')['src'] if item.find('img') else "No image URL found"
                 if img_url.startswith('//'):
                     img_url = 'https:' + img_url
 
