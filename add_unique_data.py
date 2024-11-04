@@ -1,8 +1,11 @@
 import csv
 from datetime import datetime, timedelta
-from scrape import get_new_data  # このインポートを維持し、循環インポートがないことを確認
+from scrape import get_new_data
 
+# CSVファイルのパス
 csv_file = 'data.csv'
+
+# 有効期限（例: 30日）
 valid_duration = timedelta(days=30)
 today = datetime.today()
 
